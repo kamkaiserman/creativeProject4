@@ -1,0 +1,73 @@
+<!doctype html>
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+<script src="https://code.jquery.com/jquery-3.3.1.min.js" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+<script src="/socket.io/socket.io.js"></script>
+
+<head>
+    <style>
+        body {
+            background-color: #FFFCEE;
+        }
+        
+    </style>
+</head>
+
+<div class="container">
+    <br>
+    <div class="jumbotron" style="background-color: #CACDFF; padding: 50px 30px 10px 30px;">
+        
+        <div style="text-align: center; padding: 0px 0px 20px 0px">
+        <h1 class="display-4">Live CS260 Message Board</h1>
+        <h4>Send live messages to all the other students in class!</h4>
+        </div>
+        <a class="btn btn-info" data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+            Click here for disscusion topics
+        </a>
+            <div class="collapse" id="collapseExample" style="padding: 10px 0px 10px 0px;">
+              <div class="card card-body">
+                1. Post the best creative projects! <br>
+                2. Who's the spiciest TA? <br>
+                3. Are you looking for love? (Get a hot date)<br>
+              </div>
+            </div>
+ 
+        <div style="padding: 10px 0px 10px 0px;">
+        <input id="name" class="form-control" placeholder="Name">
+        <br>
+        <textarea id="message" class="form-control" placeholder="Message"></textarea>
+        <br>
+        <button id="send" class="btn btn-success">Send</button>
+        </div>
+    </div>
+    <div id="messages" style="color: #333;">
+        
+    </div>
+</div>
+<script>
+    var socket = io()
+    $(() => {
+        $("#send").click(() => {
+            var message = { name: $("#name").val(), message: $("#message").val()}
+            postMessages(message)
+        })
+        getMessages()
+    })
+    
+    socket.on('message', addMessage)
+    
+    function addMessage(message){
+        $("#messages").prepend(`<h4> ${message.name} </h4> <p> ${message.message} </p>`)
+    }
+    
+    function getMessages(){
+        $.get('http://34.221.124.46:4200/messages', (data) => {
+            data.forEach(addMessage);
+        })
+    }
+    function postMessages(message) {
+        $.post('http://34.221.124.46:4200/messages', message)
+    }
+</script>
